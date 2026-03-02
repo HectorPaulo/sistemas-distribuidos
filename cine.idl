@@ -1,0 +1,92 @@
+// IDL para el sistema de cine
+module Cine {
+
+    // Estructuras de datos
+    struct Pelicula {
+        long id;
+        string titulo;
+        string genero;
+        long duracion; // en minutos
+    };
+
+    struct Sala {
+        long id;
+        string nombre;
+        long filas;
+        long columnas;
+    };
+
+    struct Funcion {
+        long id;
+        long peliculaId;
+        long salaId;
+        string fecha; // formato: YYYY-MM-DD
+        string hora; // formato: HH:MM
+    };
+
+    struct Asiento {
+        long fila;
+        long columna;
+        boolean ocupado;
+    };
+
+    struct Boleto {
+        long id;
+        long funcionId;
+        long fila;
+        long columna;
+        string nombreCliente;
+        double precio;
+    };
+
+    typedef sequence<Pelicula> ListaPeliculas;
+    typedef sequence<Sala> ListaSalas;
+    typedef sequence<Funcion> ListaFunciones;
+    typedef sequence<Asiento> ListaAsientos;
+    typedef sequence<Boleto> ListaBoletos;
+    typedef sequence<long> ListaNumeros;
+
+    // Excepciones
+    exception ErrorValidacion {
+        string mensaje;
+    };
+
+    // Interfaz del servidor
+    interface SistemaCine {
+        // Gestión de películas
+        long crearPelicula(in string titulo, in string genero, in long duracion)
+            raises (ErrorValidacion);
+        ListaPeliculas obtenerPeliculas();
+        Pelicula obtenerPelicula(in long id) raises (ErrorValidacion);
+
+        // Gestión de salas
+        long crearSala(in string nombre, in long filas, in long columnas)
+            raises (ErrorValidacion);
+        ListaSalas obtenerSalas();
+        Sala obtenerSala(in long id) raises (ErrorValidacion);
+
+        // Gestión de funciones
+        long crearFuncion(in long peliculaId, in long salaId,
+                         in string fecha, in string hora)
+            raises (ErrorValidacion);
+        ListaFunciones obtenerFunciones();
+        ListaFunciones obtenerFuncionesPorFecha(in string fecha);
+        Funcion obtenerFuncion(in long id) raises (ErrorValidacion);
+
+        // Gestión de asientos y boletos
+        ListaAsientos obtenerAsientosFuncion(in long funcionId)
+            raises (ErrorValidacion);
+        long generarBoleto(in long funcionId, in long fila, in long columna,
+                          in string nombreCliente, in double precio)
+            raises (ErrorValidacion);
+        ListaBoletos generarBoletosMultiples(in long funcionId,
+                                            in ListaNumeros filas,
+                                            in ListaNumeros columnas,
+                                            in string nombreCliente,
+                                            in double precio)
+            raises (ErrorValidacion);
+        Boleto obtenerBoleto(in long id) raises (ErrorValidacion);
+        ListaBoletos obtenerTodosBoletos();
+    };
+};
+
